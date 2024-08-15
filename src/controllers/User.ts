@@ -47,8 +47,23 @@ export const getAllUser = async (req : Request , res : Response) => {
     });
     try {
         await client.connect();
-        const usersQuery = `SELECT * FROM users`
-        const users = await client.query(usersQuery);
+        // const usersQuery = `SELECT * FROM users`
+        const userQuery = `SELECT 
+        u.id,
+        u.username,
+        u.email,
+        a.city,
+        a.country,
+        a.street,
+        a.pincode,
+        u.created_at
+    FROM 
+        Users u
+   LEFT JOIN 
+        addresses a 
+    ON 
+        u.id = a.user_id `
+        const users = await client.query(userQuery);
         console.log(users , "users");
         return res.status(200).send({
             message : "Users fetched Successfully !",
@@ -98,7 +113,7 @@ export const addAddress = async (req : Request , res : Response) => {
         const addressQuery = `INSERT INTO addresses (user_id , city , country , street , pincode) VALUES ($1 , $2 , $3 , $4 , $5) `
         const values = [user_id ,city ,country , street , pincode]
         const address = await client.query(addressQuery , values );
-        if(address.rowCount > 1) {
+        if(address?.rowCount != 0) {
             res.status(200).send({
                 message : "Address Added Successfully !"
             })
