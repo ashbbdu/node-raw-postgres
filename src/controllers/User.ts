@@ -70,8 +70,9 @@ export const getUser = async (req : Request , res : Response) => {
     });
     try {
        await client.connect();
-        const userQurery = `SELECT * FROM users WHERE id = ${id}`
-        const user = await client.query(userQurery);
+        // const userQurery = `SELECT * FROM users WHERE id = ${id}` // don't use this because of SQL Injection (Learn more about SQL injection)
+        const userQurery = `SELECT * FROM users WHERE id = $1`
+        const user = await client.query(userQurery , [id]);
         return res.status(200).send({
             message : "User fetched successfully !",
             user : user.rows[0]
